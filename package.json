@@ -1,0 +1,23 @@
+{
+  "name": "linodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "base64-img": "^1.0.4",
+    "express": "^4.18.1",
+    "formidable": "^2.1.1",
+    "html-webpack-plugin": "^5.5.0",
+    "node-fetch": "^3.2.4",
+    "opn": "^6.0.0",
+    "vue": "^3.2.37",
+    "webpack": "^5.74.0"
+  }
+}

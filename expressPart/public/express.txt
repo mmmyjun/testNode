@@ -1,0 +1,2 @@
+app.use('/static', express.static('public'))
+哈哈哈li'lilili
