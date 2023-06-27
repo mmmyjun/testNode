@@ -1,6 +1,23 @@
-// const fs = require('fs')
+// const fs = require('fs');
+import fs from 'fs';
+// const testExport = require('./testExport.mjs');
+import testExport from './testExport.mjs' // testExport。mjs里是export defauult a;如果采用这种方式，首先import得置顶，其次当前1.js文件改成1.mjs。
+console.log('导出', testExport)
+function getAllFiles(dirName) {
+    fs.readdirSync(dirName).map(e => {
+        const curPaths = `${dirName}/${e}/`;
+        console.log('当前', e, fs.lstatSync(curPaths).isDirectory())
+        if (fs.lstatSync(curPaths).isDirectory()) {
+            console.log('接下来读取', curPaths)
+            getAllFiles(curPaths)
+        }
+    })
+}
+getAllFiles('.')
+
 // const path = require('path')
 // console.log(fs)
+
 // const getFile = (fileName) => {
 //     return new Promise((resolve, reject) => {
 //         resolve(fs.readFileSync(fileName, {encoding: 'utf8'}))
@@ -54,17 +71,7 @@
 
 
 
-// function getAllFiles(dirName) {
-//     fs.readdirSync(dirName).map(e => {
-//         const curPaths = `${dirName}/${e}/`;
-//         console.log('当前', e, fs.lstatSync(curPaths).isDirectory())
-//         if (fs.lstatSync(curPaths).isDirectory()) {
-//             console.log('接下来读取', curPaths)
-//             getAllFiles(curPaths)
-//         }
-//     })
-// }
-// getAllFiles('.')
+
 
 // console.log('__dirname', __dirname)
 // console.log('process', process)
@@ -81,19 +88,15 @@
 // console.log(config, compiler,'config--')
 
 
-// const testExport = require('./testExport.js');
-// import testExport from './testExport.mjs' // testExport。mjs里是export defauult a;如果采用这种方式，首先import得置顶，其次当前1.js文件改成1.mjs。
-// console.log('导出', testExport)
-
 // var origin = `<script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"videos": []}}}</script>`
 // console.log(origin.match(/[^(<script id=\"__NEXT_DATA__\" type=\"application\/json\">)(<\/script>)]/))   
 // console.log(`<script>{"props":{"pageProps":{"videos": []}}}</script>`.match(/[^script]/))
 
-var patt1 = /[^(\<script\>)]+\<\/script\>$/;
-var patt1 = /\>\b.+\<\/script\>$/;
+// var patt1 = /[^(\<script\>)]+\<\/script\>$/;
+// var patt1 = /\>\b.+\<\/script\>$/;
 
 // \b是单词边界 .是非换行符以外得部分
-var str = "goYgle Runoob taobao";
+// var str = "goYgle Runoob taobao";
 // var patt1 = /\b\w/g;
 // console.log(str.match(patt1));
 // console.log(str.replace(patt1, v => v.toUpperCase()));

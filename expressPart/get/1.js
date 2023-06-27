@@ -16,9 +16,6 @@ app.get('/abc', (req, res) => {
 })
 const serr = app.listen(3000, () => console.log('server ready'))
 
-process.argv.forEach((val, index) => {
-    console.log('参数',`${index}: ${val}`)
-})
 
 // process.exit(1)
 // process.on('SIGTERM', () => {

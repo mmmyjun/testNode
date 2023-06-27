@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+
 const path = require('path');
 
 
@@ -15,6 +16,34 @@ const server = http.createServer((req, res) => {
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
+
+
+
+async function getContentOfText() {
+    let newContent = 'Some newContent!';
+    const readResult = fs.readFile('test.txt', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        console.log('readFile test.txt',data);
+        newContent = data;
+        fs.writeFile('result.txt', newContent, err => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log('file written successfully')
+            // file written successfully
+        });
+    });
+    console.log('readResult', readResult)
+}
+
+// var data = fs.readFileSync('./test.txt', 'utf8');
+// console.log(data, '同步读取到的');
+
+
 
 
 // document.getElementById('button').addEventListener('click', () => {
@@ -78,11 +107,13 @@ fs.stat('./test.txt', (err, stats) => {
 // path.resolve('/etc', 'joe.txt'); // '/etc/joe.txt'  If the first parameter starts with a slash, that means it's an absolute path:
 // path.normalize('/users/joe/..//test.txt'); // '/users/test.txt'
 
-const ffff= fs.open('./test.txt', 'a+', (err, fd) => {
-    // fd is our file descriptor
-    console.log('只读打开文件test.txt', err, fd)
-});
-console.log('ffffffffff', ffff)
+
+// const ffff= fs.open('./test.txt', 'a+', (err, fd) => {
+//     // fd is our file descriptor
+//     console.log('只读打开文件test.txt', err, fd)
+// });
+// console.log('ffffffffff', ffff)
+
 
 // try {
 //     const fd = fs.openSync('/Users/joe/test.txt', 'r');
@@ -107,13 +138,6 @@ console.log('ffffffffff', ffff)
 
 
 
-fs.readFile('test.txt', 'utf8', (err, data) => {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    console.log('readFile',data);
-});
 // try {
 //     const data = fs.readFileSync('/Users/joe/test.txt', 'utf8');
 //     console.log(data);
@@ -133,15 +157,16 @@ fs.readFile('test.txt', 'utf8', (err, data) => {
 // example();
 
 
+// 往文件追加内容
+// fs.appendFile('file.log', newContent, err => {
+//     if (err) {
+//         console.error(err);
+//     }
+//     // done!
+// });
 
+// console.log('测试test文件的信息', fs.lstatSync('test.txt'))
 
-const content = 'Some content!';
-fs.writeFile('/Users/joe/test.txt', content, err => {
-    if (err) {
-        console.error(err);
-    }
-    // file written successfully
-});
 
 // try {
 //     fs.writeFileSync('/Users/joe/test.txt', content);
@@ -165,15 +190,6 @@ fs.writeFile('/Users/joe/test.txt', content, err => {
 
 
 
-
-
-
-fs.appendFile('file.log', content, err => {
-    if (err) {
-        console.error(err);
-    }
-    // done!
-});
 // const fs = require('fs/promises');
 // async function example() {
 //     try {
@@ -188,14 +204,14 @@ fs.appendFile('file.log', content, err => {
 
 
 
-const folderName = '/Users/joe/test';   
-try {
-    if (!fs.existsSync(folderName)) {
-        fs.mkdirSync(folderName);
-    }
-} catch (err) {
-    console.error(err);
-}
+// const folderName = '/Users/joe/test';   
+// try {
+//     if (!fs.existsSync(folderName)) {
+//         fs.mkdirSync(folderName);
+//     }
+// } catch (err) {
+//     console.error(err);
+// }
 
 
 // const folderPath = '/Users/joe';
@@ -214,32 +230,31 @@ try {
 //     })
 //     .filter(isFile);
 
-console.log('测试test文件的信息', fs.lstatSync('test.txt'))
 
 
 
 // Rename a folder
-fs.rename('/Users/joe', '/Users/roger', err => {
-    if (err) {
-        console.error(err);
-    }
-    // done
-});
+// fs.rename('/Users/joe', '/Users/roger', err => {
+//     if (err) {
+//         console.error(err);
+//     }
+//     // done
+// });
 
-try {
-    fs.renameSync('/Users/joe', '/Users/roger');
-} catch (err) {
-    console.error(err);
-}
+// try {
+//     fs.renameSync('/Users/joe', '/Users/roger');
+// } catch (err) {
+//     console.error(err);
+// }
 
-async function example() {
-    try {
-        await fs.rename('/Users/joe', '/Users/roger');
-    } catch (err) {
-        console.log(err);
-    }
-}
-example();
+// async function example() {
+//     try {
+//         await fs.rename('/Users/joe', '/Users/roger');
+//     } catch (err) {
+//         console.log(err);
+//     }
+// }
+// example();
 
 
 
