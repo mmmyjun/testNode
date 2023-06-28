@@ -1,5 +1,3 @@
-// 目前存在得问题: 上传接口报错、右键查看属性和重命名失效！！！！！！！！！！！！！！！！！！！！！！！
-
 const http = require('http')
 const fs = require('fs')
 const url = require('url')
@@ -189,9 +187,40 @@ var server = http.createServer((request, response) => {
     */
 
     let managerRoot = __dirname + '/root'
+    if (api_id == 'updateFileName') {
+        let { path: fullPath='', oldName, newName, suffix } = paras;
+        
+        let pathOfNewName = suffix ? fullPath.replace(oldName, newName + '.' + suffix) : fullPath.replace(oldName, newName)
+        fs.rename(fullPath, pathOfNewName, (err) => {
+            if (err) throw err;
+            else {
+                let _query_path = paras.curPath ? paras.curPath : ''
+                let _path = managerRoot + _query_path;
+                files = fs.readdirSync(_path);
+                var output = {};
+                output.relativePath = _query_path;
+                output._fileList = [];
+                files.forEach((file, index) => {
+                    let curPath = _path + '/' + file;
+                    let item_obj = {};
+                    item_obj.path = curPath;
+                    item_obj.isDir = fs.statSync(curPath).isDirectory();
+                    item_obj.name = file;
+                    var ext = path.extname(curPath).toLowerCase();
+                    item_obj.ext = ext ? ext.slice(1) : ''
+                    output._fileList.push(item_obj)
+                });
+                response.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
+                response.write(render(output), 'utf8')
+                response.end();
+            }
+          
+        })
 
 
-    if (api_id == 'upload') {
+    } else if (api_id == 'upload') {
         if (request.method == 'GET') {
             _res_body = 'no supported method.'
             response.writeHead(200, {
@@ -212,12 +241,13 @@ var server = http.createServer((request, response) => {
                 _query.path = value
             });
             form.on('file', (name, file) => {
+                console.log('file~~~~', file, file.path, file.filepath, file.newFilename)
                 if (file) {
                     statusCode = 1;
-                    let steam = fs.createReadStream(file.path);
-                    let destination = fs.createWriteStream(managerRoot + _query.path + '/' + file.name);
+                    let steam = fs.createReadStream(file.filepath);
+                    let destination = fs.createWriteStream(managerRoot + _query.path + '/' + file.originalFilename);
                     steam.pipe(destination, () => {
-                        fs.unlinkSync(file.path);
+                        fs.unlinkSync(file.filepath);
                     });
                 }
                 response.writeHead(200, {
@@ -329,6 +359,7 @@ console.log('server run at port:1250')
 
 
 function render(json) {
+    console.log('rendering', json)
     let _list = json._fileList || [];
     let html = '<ul>'
     if (json.relativePath) {
@@ -345,7 +376,7 @@ function render(json) {
         else {
             html += `<div class="block ${item.ext}">`
         }
-        html += `${isImg(item.path)}</div><p class="title" title="${item.name}">${item.name}</p></li>`
+        html += `${isImg(item.path)}</div><p class="title" title="${item.name}" data-suffix="${item.ext}" data-isdir="${item.isDir}" data-path="${item.path}">${item.name}</p></li>`
     }
     return html + '</ul>'
 }

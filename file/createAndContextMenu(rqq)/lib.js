@@ -1,7 +1,7 @@
 $().ready(init);
 
 var curPath = '',
-    _contextmenuElm /* 保存当前右键菜单选择的元素 */
+    _contextmenuElm, _allExistContextMenu /* 保存当前右键菜单选择的元素 */
 
 function init() {
     listFiles()
@@ -28,6 +28,7 @@ function init() {
 
     $(document).on('contextmenu', '.files ul .item', function (e) {
         _contextmenuElm = $(this).find('.block');
+        _allExistContextMenu =  $(this).find('.block');
         if (!$('.contextmenu').length) {
             renderContextmenu('dir');
         }
@@ -58,8 +59,10 @@ function init() {
                 })
             }
             else if (_oper_id == 2) {
+                let suffix = _contextmenuElm.siblings('p.title')[0].dataset.suffix
+                let idx = _item_title.indexOf('.'+ suffix)
                 sync(function () {
-                    var _new_name = window.prompt('重命名', _item_title);
+                    var _new_name = window.prompt('重命名（不允许改后缀）', idx > - 1 ? _item_title.slice(0, idx) : _item_title );
                     if (_new_name) {
                         renameItem(_new_name)
                     }
@@ -80,7 +83,8 @@ function init() {
 }
 
 function renderContextmenu(type) {
-    var menus = ['打开', '删除', '重命名', '属性'];
+    // var menus = ['打开', '删除', '重命名', '属性'];
+    var menus = ['打开', '删除', '重命名'];
     var temp = '<div class="contextmenu"><ul>'
     for (var i = 0; i < menus.length; i++) {
         temp += '<li><a data-id="' + i + '">' + menus[i] + '</a></li>'
@@ -193,8 +197,24 @@ function deleteItem(path) {
 }
 
 
-function renameItem(path) {
-    console.log(path)
+function renameItem(newName) {
+    let curDom = _allExistContextMenu.siblings('p.title')[0];
+    let curDomSet = curDom.dataset
+    
+    var ops = {
+        type: 'GET',
+        url: '/?api=updateFileName&newName=' + newName + '&path=' + curDomSet.path + '&oldName=' + curDom.title + '&suffix=' + curDomSet.suffix + '&isdir=' + curDomSet.isdir + '&curPath=' + curPath,
+        contentType: 'text/html',
+        success: function (data) {
+            if (data) {
+                $('.files').html(data);
+            }
+        },
+        error: function (err) {
+            console.log('error:' + err)
+        }
+    }
+    $.ajax(ops)
 }
 
 function sync(fun) {
