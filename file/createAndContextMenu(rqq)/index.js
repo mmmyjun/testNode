@@ -187,7 +187,20 @@ var server = http.createServer((request, response) => {
     */
 
     let managerRoot = __dirname + '/root'
-    if (api_id == 'updateFileName') {
+    if (api_id == 'downFile') {
+        console.log('下载中..', paras)
+        let { path: fullPath='', fileName } = paras;
+        let rs = fs.createReadStream(fullPath)
+        response.writeHead(200, {
+            'Content-Type': 'application/force-download',
+            'Content-Disposition': `attachment; filename* = UTF-8''${encodeURIComponent(fileName)}`
+        })
+        // 把可读流传给响应式对象response
+        rs.pipe(response)
+        console.log('车工下载')
+
+
+    } else if (api_id == 'updateFileName') {
         let { path: fullPath='', oldName, newName, suffix } = paras;
         
         let pathOfNewName = suffix ? fullPath.replace(oldName, newName + '.' + suffix) : fullPath.replace(oldName, newName)
@@ -354,7 +367,7 @@ var server = http.createServer((request, response) => {
     }
 });
 server.listen(1250);
-opn('http://localhost:1250')
+// opn('http://localhost:1250')
 console.log('server run at port:1250')
 
 
@@ -369,11 +382,12 @@ function render(json) {
     }
     for (let i in _list) {
         let item = _list[i];
-        html += '<li class="item">'
         if (item.isDir) {
+            html += '<li class="item isDirItem">'
             html += `<div class="block dir" data-dir="${json.relativePath + '/' + item.name}">`
         }
         else {
+            html += '<li class="item isCommonItem">'
             html += `<div class="block ${item.ext}">`
         }
         html += `${isImg(item.path)}</div><p class="title" title="${item.name}" data-suffix="${item.ext}" data-isdir="${item.isDir}" data-path="${item.path}">${item.name}</p></li>`

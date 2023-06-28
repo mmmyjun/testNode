@@ -27,10 +27,15 @@ function init() {
     });
 
     $(document).on('contextmenu', '.files ul .item', function (e) {
+        hideContextmenu();
+        
+        console.log($(this))
+        let isCommonItem = $(this).hasClass('isCommonItem')
+        console.log(isCommonItem, 'isCommonItem=====')
         _contextmenuElm = $(this).find('.block');
         _allExistContextMenu =  $(this).find('.block');
         if (!$('.contextmenu').length) {
-            renderContextmenu('dir');
+            renderContextmenu(isCommonItem);
         }
         var contextmenu = $('.contextmenu')
         contextmenu.css({
@@ -43,22 +48,24 @@ function init() {
 
     $(document).on('click', '.contextmenu ul li a', function (e) {
         e.stopPropagation();
-        var _oper_id = $(this).data('id')
+        // var _oper_id = $(this).data('id')
+        var _oper_name = $(this).data('name')
         var _item_title = _contextmenuElm.siblings('p.title').text()
         var isDir = _contextmenuElm.hasClass('dir');
         var _path = isDir ? _contextmenuElm.data('dir') : curPath + '/' + _item_title
+        console.log('点击 li a', _path, isDir)
         if (_contextmenuElm) {
-            if (_oper_id == 0) {
+            if (_oper_name == '打开') {
                 _contextmenuElm.trigger('click')
             }
-            else if (_oper_id == 1) {
+            else if (_oper_name == '删除') {
                 sync(function () {
                     if (window.confirm('是否删除该项目?')) {
                         deleteItem(_path)
                     }
                 })
             }
-            else if (_oper_id == 2) {
+            else if (_oper_name == '重命名') {
                 let suffix = _contextmenuElm.siblings('p.title')[0].dataset.suffix
                 let idx = _item_title.indexOf('.'+ suffix)
                 sync(function () {
@@ -67,7 +74,12 @@ function init() {
                         renameItem(_new_name)
                     }
                 })
+            }  else if (_oper_name == '下载') { // 下载
+                let suffix = _contextmenuElm.siblings('p.title')[0].dataset.suffix
+                let idx = _item_title.indexOf('.'+ suffix)
+                downloadFile()
             }
+
         }
         hideContextmenu()
     });
@@ -82,19 +94,22 @@ function init() {
     });
 }
 
-function renderContextmenu(type) {
+function renderContextmenu(isCommonItem) {
     // var menus = ['打开', '删除', '重命名', '属性'];
-    var menus = ['打开', '删除', '重命名'];
+    // var menus = ['打开', '删除', '重命名', '下载'];
+    var menus = isCommonItem ? ['删除', '重命名', '下载'] : ['删除', '重命名'];
+    console.log('caidan ~~~', menus, isCommonItem)
     var temp = '<div class="contextmenu"><ul>'
     for (var i = 0; i < menus.length; i++) {
-        temp += '<li><a data-id="' + i + '">' + menus[i] + '</a></li>'
+        temp += '<li><a data-id="' + i + '" data-name="' + menus[i] + '" >' + menus[i] + '</a></li>'
     }
     temp += '</ul></div>'
     $(temp).appendTo($('body'))
 }
 
 function hideContextmenu() {
-    $('.contextmenu').hide();
+    // $('.contextmenu').hide();
+    $('.contextmenu').remove()
     _contextmenuElm = null;
 }
 
@@ -216,7 +231,37 @@ function renameItem(newName) {
     }
     $.ajax(ops)
 }
+function downloadFile() {
+    let curDom = _allExistContextMenu.siblings('p.title')[0];
+    let curDomSet = curDom.dataset
 
+    const url = new URLSearchParams({
+        api: 'downFile',
+        path: curDomSet.path,
+        fileName: curDom.title
+    })
+
+    const a = document.createElement('a')
+    a.href = `/?${url}`;
+    a.download = curDom.title
+    a.click()
+    
+    // var ops = {
+    //     type: 'GET',
+    //     url: `/?${url}`,
+    //     contentType: 'text/html',
+    //     success: function (data) {
+    //         console.log('下载成功', data)
+    //         if (data) {
+    //             // $('.files').html(data);
+    //         }
+    //     },
+    //     error: function (err) {
+    //         console.log('下载error:' + err)
+    //     }
+    // }
+    // $.ajax(ops)
+}
 function sync(fun) {
     setTimeout(fun, 0)
 }
